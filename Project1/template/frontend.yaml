@@ -20,10 +20,10 @@ spec:
       - image: cloudacademydevops/frontend:replaceImageTag
         name: frontend
         ports:
-          - containerPort: 8080
+          - containerPort: 5173
         env:
-          - name: REACT_APP_APIHOSTPORT
-            value: 35.225.221.208:8080
+          - name: VITE_API_PATH
+            value: http://35.238.42.194:31100
         resources: 
           requests:
             cpu: "10m"

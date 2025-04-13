@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  ACCESS_COOKIE_MAXAGE: "120000"
+  ACCESS_TOKEN_EXPIRES_IN: 120s
+  FRONTEND_URL: http://35.238.42.194:5173
+  MONGODB_URI: mongodb://mongo-service/devsecops-project1
+  NODE_ENV: Development
+  PORT: "8080"
+  REDIS_URL: redis://redis-service:6379
+  REFRESH_COOKIE_MAXAGE: "120000"
+  REFRESH_TOKEN_EXPIRES_IN: 120s
+kind: ConfigMap
+metadata:
+  name: backend-cm
+  namespace: devsecops-project1

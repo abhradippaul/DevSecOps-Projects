@@ -4,7 +4,7 @@ metadata:
   labels:
     app: mongo-service
   name: mongo-service
-  namespace: voting-app
+  namespace: devsecops-project1
 spec:
   clusterIP: None
   ports:

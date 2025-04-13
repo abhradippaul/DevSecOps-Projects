@@ -4,4 +4,4 @@ data:
 kind: ConfigMap
 metadata:
   name: mongo-cm
-  namespace: voting-app
+  namespace: devsecops-project1

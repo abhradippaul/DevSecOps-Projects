@@ -1,0 +1,123 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout CI') {
+            steps {
+                git url: "https://github.com/abhradippaul/DevSecOps-Projects.git", branch: "main"
+            }
+        }
+        stage('SonarQube Code Analysis CI') {
+             agent {
+                        docker {
+                            image "abhradippaul/node-sonar-scanner"
+                            args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
+                        }
+                    }
+                steps {
+                    script {
+                        withSonarQubeEnv('sonar-scanner') {
+                            sh "cd Project1 && sonar-scanner -Dsonar.projectName=devsecops_project1 -Dsonar.projectKey=devsecops_project1"
+                        }
+                    }
+                }
+          }
+             stage("SonarQube Quality Gate Check CI") {
+                steps {
+                    script {
+                    def qualityGate = waitForQualityGate()
+                        
+                        if (qualityGate.status != 'OK') {
+                            echo "${qualityGate.status}"
+                            error "Quality Gate failed: ${qualityGateStatus}"
+                        }
+                        else {
+                            echo "${qualityGate.status}"
+                            echo "SonarQube Quality Gates Passed"
+                        }
+                    }
+                }
+        }
+        stage("Test the filesystem CI") {
+            steps {
+                parallel(
+                  a: {
+                    sh "cd Project1 && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache  alpine/trivy fs -f table -o /root/trivy-reports/frontend-filesystem-scan ."
+                  },
+                  b: {
+                    sh "cd Project1 && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache alpine/trivy fs -f table -o /root/trivy-reports/backend-filesystem-scan ."
+                  }
+                )
+            }
+        }
+        stage ("OWASP CI") {
+            agent {
+                        docker {
+                            image "abhradippaul/node-owasp"
+                            args "--user root -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/dependency-check:/tmp/dependency-check -v /home/abhradip_paul/.dependency-check:/root/.dependency-check"
+                        }
+                    }
+            steps { 
+                parallel(
+                  a: {
+                    sh "cd Project1/frontend && npm install"
+                    sh '/tmp/dependency-check/bin/dependency-check.sh --scan Project1/frontend --data /root/.dependency-check --out /reports/frontend-owasp-report'
+                  },
+                  b: {
+                    sh "cd Project1/backend && npm install"
+                    sh '/tmp/dependency-check/bin/dependency-check.sh --scan Project1/backend --data /root/.dependency-check --out /reports/backend-owasp-report'
+                  }
+                )
+                
+            }
+        }
+        stage("Build Image CI") {
+            steps {
+                parallel(
+                  a: {
+                    sh "cd Project1/frontend && docker build -t abhradippaul/devsecops-project1-frontend ."
+                  },
+                  b: {
+                    sh "cd Project1/backend && docker build -t abhradippaul/devsecops-project1-backend ."
+                  }
+                )
+            }
+        }
+        stage("Test the image CI") {
+            steps {
+                parallel(
+                  a: {
+                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache  alpine/trivy image -f table -o /root/trivy-reports/frontend-image-scan abhradippaul/devsecops-project1-frontend"
+                  },
+                  b: {
+                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache alpine/trivy image -f table -o /root/trivy-reports/backend-image-scan abhradippaul/devsecops-project1-backend"
+                  }
+                )
+            }
+        }
+        stage("Push the image CI") {
+            steps {
+                parallel(
+                  a: {
+                     withCredentials([
+                        usernamePassword(credentialsId: "dockerhub-jenkins",
+                        usernameVariable: "username", 
+                        passwordVariable: "password")]) {
+                            sh "docker login -u $username -p $password"
+                            sh "docker push $username/devsecops-project1-frontend"
+                        }
+                  },
+                  b: {
+                        withCredentials([
+                        usernamePassword(credentialsId: "dockerhub-jenkins",
+                        usernameVariable: "username", 
+                        passwordVariable: "password")]) {
+                            sh "docker login -u $username -p $password"
+                            sh "docker push $username/devsecops-project1-backend"
+                        }
+                  }
+                )
+            }
+        }
+    }
+}

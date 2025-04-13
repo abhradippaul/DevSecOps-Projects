@@ -16,17 +16,4 @@ RUN wget -O sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sona
 ENV PATH="/opt/sonar-scanner/bin:$PATH"
 ENV SONAR_SCANNER_OPTS="-server"
 
-# Verify installation
-RUN sonar-scanner -v
-
-RUN wget https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.deb
-
-RUN dpkg -i trivy_0.18.3_Linux-64bit.deb && rm -rf trivy_0.18.3_Linux-64bit.deb
-
-RUN echo 'deb http://download.opensuse.org/repositories/home:/cabelo/xUbuntu_22.10/ /' | tee /etc/apt/sources.list.d/home:cabelo.list
-
-RUN curl -fsSL https://download.opensuse.org/repositories/home:cabelo/xUbuntu_22.10/Release.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/home_cabelo.gpg > /dev/null
-
-RUN apt update
-
 CMD ["node"]

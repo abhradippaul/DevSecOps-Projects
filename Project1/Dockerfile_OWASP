@@ -1,0 +1,5 @@
+FROM node
+
+RUN apt update && apt install openjdk-17-jdk -y
+
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64/

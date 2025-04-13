@@ -17,7 +17,7 @@ spec:
         app: frontend
     spec:
       containers:
-      - image: cloudacademydevops/frontend:v1
+      - image: cloudacademydevops/frontend:v2
         name: frontend
         ports:
           - containerPort: 8080

@@ -17,7 +17,7 @@ spec:
         app: backend
     spec:
       containers:
-      - image: cloudacademydevops/api:v5
+      - image: cloudacademydevops/api:v6
         name: backend
         ports:
           - containerPort: 8080

@@ -1,16 +1,20 @@
 pipeline {
     agent any
+    
+    environment {
+        BUILD_NUMBER = "${params.BUILD_NUMBER}"
+    }
 
     stages {
-        stage('Checkout CI') {
+        stage('Checkout (CI)') {
             steps {
-                git url: "https://github.com/abhradippaul/DevSecOps-Projects.git", branch: "main"
+                git url: "https://github.com/abhradippaul/DevSecOps-Projects.git", branch: "project1"
             }
         }
-        stage('SonarQube Code Analysis CI') {
+        stage('SonarQube Code Analysis (CI)') {
              agent {
                         docker {
-                            image "abhradippaul/node-sonar-scanner"
+                            image "abhradippaul/devsecops-project1"
                             args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
                         }
                     }
@@ -22,7 +26,7 @@ pipeline {
                     }
                 }
           }
-             stage("SonarQube Quality Gate Check CI") {
+             stage("SonarQube Quality Gate Check (CI)") {
                 steps {
                     script {
                     def qualityGate = waitForQualityGate()
@@ -38,19 +42,19 @@ pipeline {
                     }
                 }
         }
-        stage("Test the filesystem CI") {
+        stage("Test the filesystem (CI)") {
             steps {
                 parallel(
-                  a: {
-                    sh "cd Project1 && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache  alpine/trivy fs -f table -o /root/trivy-reports/frontend-filesystem-scan ."
+                  "FRONTEND": {
+                    sh "cd Project1/frontend && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache  alpine/trivy fs -f table -o /root/trivy-reports/frontend-filesystem-scan ."
                   },
-                  b: {
-                    sh "cd Project1 && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache alpine/trivy fs -f table -o /root/trivy-reports/backend-filesystem-scan ."
+                  "BACKEND": {
+                    sh "cd Project1/backend && docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache alpine/trivy fs -f table -o /root/trivy-reports/backend-filesystem-scan ."
                   }
                 )
             }
         }
-        stage ("OWASP CI") {
+        stage ("OWASP (CI)") {
             agent {
                         docker {
                             image "abhradippaul/node-owasp"
@@ -59,11 +63,11 @@ pipeline {
                     }
             steps { 
                 parallel(
-                  a: {
+                  "FRONTEND": {
                     sh "cd Project1/frontend && npm install"
                     sh '/tmp/dependency-check/bin/dependency-check.sh --scan Project1/frontend --data /root/.dependency-check --out /reports/frontend-owasp-report'
                   },
-                  b: {
+                  "BACKEND": {
                     sh "cd Project1/backend && npm install"
                     sh '/tmp/dependency-check/bin/dependency-check.sh --scan Project1/backend --data /root/.dependency-check --out /reports/backend-owasp-report'
                   }
@@ -71,52 +75,63 @@ pipeline {
                 
             }
         }
-        stage("Build Image CI") {
+        stage("Build And Test image (CI)") {
             steps {
                 parallel(
-                  a: {
-                    sh "cd Project1/frontend && docker build -t abhradippaul/devsecops-project1-frontend ."
+                  "FRONTEND": {
+                    sh "cd Project1/frontend && docker build -t abhradippaul/devsecops-project1-frontend:${BUILD_NUMBER} ."
+                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache  alpine/trivy image -f table -o /root/trivy-reports/frontend-image-scan abhradippaul/devsecops-project1-frontend:${BUILD_NUMBER}"
                   },
-                  b: {
-                    sh "cd Project1/backend && docker build -t abhradippaul/devsecops-project1-backend ."
+                  "BACKEND": {
+                    sh "cd Project1/backend && docker build -t abhradippaul/devsecops-project1-backend:${BUILD_NUMBER} ."
+                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache alpine/trivy image -f table -o /root/trivy-reports/backend-image-scan abhradippaul/devsecops-project1-backend:${BUILD_NUMBER}"
                   }
                 )
             }
         }
-        stage("Test the image CI") {
+        stage("Docker login (CI)") {
             steps {
-                parallel(
-                  a: {
-                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache  alpine/trivy image -f table -o /root/trivy-reports/frontend-image-scan abhradippaul/devsecops-project1-frontend"
-                  },
-                  b: {
-                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /reports:/root/trivy-reports -v ~/.cache:/root/.cache alpine/trivy image -f table -o /root/trivy-reports/backend-image-scan abhradippaul/devsecops-project1-backend"
-                  }
-                )
+                withCredentials([
+                        usernamePassword(credentialsId: "dockerhub-jenkins",
+                        usernameVariable: "username", 
+                        passwordVariable: "password")]) {
+                            sh "docker login -u $username -p $password"
+                }
             }
         }
-        stage("Push the image CI") {
+        stage("Push the image (CI)") {
             steps {
-                parallel(
-                  a: {
-                     withCredentials([
-                        usernamePassword(credentialsId: "dockerhub-jenkins",
-                        usernameVariable: "username", 
-                        passwordVariable: "password")]) {
-                            sh "docker login -u $username -p $password"
-                            sh "docker push $username/devsecops-project1-frontend"
-                        }
+            parallel(
+                  "FRONTEND": {
+                    sh "docker push abhradippaul/devsecops-project1-frontend:${BUILD_NUMBER}"
                   },
-                  b: {
-                        withCredentials([
-                        usernamePassword(credentialsId: "dockerhub-jenkins",
-                        usernameVariable: "username", 
-                        passwordVariable: "password")]) {
-                            sh "docker login -u $username -p $password"
-                            sh "docker push $username/devsecops-project1-backend"
-                        }
+                  "BACKEND": {
+                    sh "docker push abhradippaul/devsecops-project1-backend:${BUILD_NUMBER}"
                   }
                 )
+        }
+    }
+        stage("GitHub commit (CI)") {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                    credentialsId: "github-jenkins", 
+                    usernameVariable: "username", 
+                    passwordVariable: "password"
+                    )]){
+                        sh '''
+                                git config user.email "abhradipserampore@gmail.com"
+                                git config user.name "${username}"
+                                cd Project1
+                                cp template/frontend.yaml manifests/frontend.yaml
+                                cp template/backend.yaml manifests/backend.yaml
+                                sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" manifests/frontend.yaml
+                                sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" manifests/backend.yaml
+                                git add manifests
+                                git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                                git push https://{username}:${password}@github.com/${username}/DevSecOps-Projects.git
+                                '''                  
+                }
             }
         }
     }

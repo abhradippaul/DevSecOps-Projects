@@ -17,7 +17,7 @@ spec:
         app: frontend
     spec:
       containers:
-      - image: cloudacademydevops/frontend:v5
+      - image: cloudacademydevops/frontend:v1
         name: frontend
         ports:
           - containerPort: 5173

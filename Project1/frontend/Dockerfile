@@ -24,6 +24,7 @@ COPY --from=frontend-builder /app .
 
 # Copy the .env.sample file to .env.local
 # COPY .env.docker .env.local
+RUN npx update-browserslist-db@latest
 
 # Expose port 5173 for the Node.js application
 EXPOSE 5173

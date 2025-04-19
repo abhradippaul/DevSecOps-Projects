@@ -12,7 +12,6 @@ RUN npm install
 
 # Copy the rest of the application code
 COPY . .
-RUN npx update-browserslist-db@latest
 
 # ------------------- Stage 2: Final Stage ------------------------------
 FROM node:22-slim
@@ -25,7 +24,7 @@ COPY --from=frontend-builder /app .
 
 # Copy the .env.sample file to .env.local
 # COPY .env.docker .env.local
-RUN npx update-browserslist-db@latest
+RUN npm update
 # Expose port 5173 for the Node.js application
 EXPOSE 5173
 

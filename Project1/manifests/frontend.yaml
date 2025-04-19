@@ -20,7 +20,7 @@ spec:
         - image: abhradippaul/devsecops-project1-frontend:v1
           name: frontend
           ports:
-            - containerPort: 5173
+            - containerPort: 80
           envFrom:
             - configMapRef:
                 name: frontend-cm

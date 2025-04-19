@@ -1,5 +1,5 @@
 # ------------------- Stage 1: Build Stage ------------------------------
-FROM node:24 AS frontend-builder
+FROM node:22 AS frontend-builder
 
 # Set the working directory to /app
 WORKDIR /app
@@ -12,9 +12,10 @@ RUN npm install
 
 # Copy the rest of the application code
 COPY . .
+RUN npx update-browserslist-db@latest
 
 # ------------------- Stage 2: Final Stage ------------------------------
-FROM node:24-slim
+FROM node:22-slim
 
 # Set the working directory to /app
 WORKDIR /app
@@ -25,7 +26,6 @@ COPY --from=frontend-builder /app .
 # Copy the .env.sample file to .env.local
 # COPY .env.docker .env.local
 RUN npx update-browserslist-db@latest
-
 # Expose port 5173 for the Node.js application
 EXPOSE 5173
 

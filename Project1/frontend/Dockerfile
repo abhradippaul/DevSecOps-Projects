@@ -6,6 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+ENV VITE_API_PATH=http://35.238.42.194:31101
+
 COPY . .
 RUN npm run build
 

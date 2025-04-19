@@ -17,13 +17,13 @@ spec:
         app: frontend
     spec:
       containers:
-      - image: abhradippaul/devsecops-project1-frontend
+      - image: cloudacademydevops/frontend:v1
         name: frontend
         ports:
           - containerPort: 5173
-        envFrom:
-            - configMapRef:
-                name: frontend-cm
+        env:
+          - name: VITE_API_PATH
+            value: http://35.238.42.194:31100
         resources: 
           requests:
             cpu: "10m"

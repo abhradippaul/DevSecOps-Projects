@@ -1,6 +1,6 @@
 apiVersion: v1
 data:
-  VITE_API_PATH: http://backend-service.devsecops-project1:3000
+  VITE_API_PATH: http://35.238.42.194:31101
 kind: ConfigMap
 metadata:
   name: frontend-cm

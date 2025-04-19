@@ -26,8 +26,8 @@ spec:
                 name: frontend-cm
           resources:
             requests:
-              cpu: "25m"
-              memory: "50Mi"
-            limits:
               cpu: "50m"
               memory: "100Mi"
+            limits:
+              cpu: "100m"
+              memory: "200Mi"

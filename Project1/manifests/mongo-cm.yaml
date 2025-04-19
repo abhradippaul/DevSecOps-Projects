@@ -1,7 +1,0 @@
-apiVersion: v1
-data:
-  MONGO_CONN_STR: mongodb://mongo-0.mongo-service:27017/langdb?replicaSet=rs0
-kind: ConfigMap
-metadata:
-  name: mongo-cm
-  namespace: devsecops-project1

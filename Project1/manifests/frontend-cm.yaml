@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  VITE_API_PATH: http://13.52.243.88:31100
+kind: ConfigMap
+metadata:
+  name: frontend-cm
+  namespace: devsecops-project1

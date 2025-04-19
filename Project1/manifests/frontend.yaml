@@ -25,9 +25,9 @@ spec:
           - name: VITE_API_PATH
             value: http://35.238.42.194:31100
         resources: 
-          requests: 
-            cpu: "50m"
-            memory: "100Mi"
+          requests:
+            cpu: "10m"
+            memory: "20Mi"
           limits:
-            cpu: "100m"
-            memory: "200Mi"
+            cpu: "20m"
+            memory: "40Mi"

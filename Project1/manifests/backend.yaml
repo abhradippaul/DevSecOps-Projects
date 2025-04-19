@@ -39,8 +39,8 @@ spec:
                 key: MONGO_INITDB_ROOT_PASSWORD
         resources: 
           requests: 
-            cpu: "10m"
-            memory: "20Mi"
+            cpu: "50m"
+            memory: "100Mi"
           limits:
-            cpu: "20m"
-            memory: "40Mi"
+            cpu: "100m"
+            memory: "200Mi"

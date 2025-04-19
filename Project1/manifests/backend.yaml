@@ -17,7 +17,7 @@ spec:
         app: backend
     spec:
       containers:
-        - image: abhradippaul/devsecops-project1-backend
+        - image: abhradippaul/devsecops-project1-backend:v1
           name: backend
           ports:
             - containerPort: 3000

@@ -7,10 +7,10 @@ metadata:
   namespace: devsecops-project1
 spec:
   ports:
-  - port: 80
+  - port: 5173
     nodePort: 31100
     protocol: TCP
-    targetPort: 80
+    targetPort: 5173
   selector:
     app: frontend
   type: NodePort

@@ -17,17 +17,17 @@ spec:
         app: frontend
     spec:
       containers:
-      - image: abhradippaul/devsecops-project1-frontend
+      - image: abhradippaul/devsecops-project1-frontend:v1
         name: frontend
         ports:
-          - containerPort: 80
+          - containerPort: 5173
         envFrom:
             - configMapRef:
                 name: frontend-cm
         resources: 
           requests:
-            cpu: "10m"
-            memory: "20Mi"
+            cpu: "50m"
+            memory: "100Mi"
           limits:
-            cpu: "20m"
-            memory: "40Mi"
+            cpu: "100m"
+            memory: "200Mi"

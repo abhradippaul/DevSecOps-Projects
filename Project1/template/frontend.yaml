@@ -17,17 +17,17 @@ spec:
         app: frontend
     spec:
       containers:
-      - image: cloudacademydevops/frontend:replaceImageTag
-        name: frontend
-        ports:
-          - containerPort: 5173
-        env:
-          - name: VITE_API_PATH
-            value: http://35.238.42.194:31100
-        resources: 
-          requests:
-            cpu: "10m"
-            memory: "20Mi"
-          limits:
-            cpu: "20m"
-            memory: "40Mi"
+        - image: abhradippaul/devsecops-project1-frontend:replaceImageTag
+          name: frontend
+          ports:
+            - containerPort: 5173
+          envFrom:
+            - configMapRef:
+                name: frontend-cm
+          resources:
+            requests:
+              cpu: "25m"
+              memory: "50Mi"
+            limits:
+              cpu: "50m"
+              memory: "100Mi"

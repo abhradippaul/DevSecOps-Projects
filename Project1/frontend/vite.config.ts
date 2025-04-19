@@ -4,9 +4,6 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  optimizeDeps: {
-    force: true,
-  },
   plugins: [react()],
   resolve: {
     alias: {

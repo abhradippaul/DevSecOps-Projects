@@ -17,6 +17,7 @@ spec:
         app: backend
     spec:
       containers:
+<<<<<<< HEAD
         - image: abhradippaul/devsecops-project1-backend
           name: backend
           ports:
@@ -33,3 +34,32 @@ spec:
             limits:
               cpu: "100m"
               memory: "200Mi"
+=======
+      - image: cloudacademydevops/api:v1
+        name: backend
+        ports:
+          - containerPort: 8080
+        env: 
+          - name: MONGO_CONN_STR
+            valueFrom:
+              configMapKeyRef: 
+                name: mongo-cm
+                key: MONGO_CONN_STR
+          - name: MONGO_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mongo-secret
+                key: MONGO_INITDB_ROOT_USERNAME
+          - name: MONGO_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mongo-secret
+                key: MONGO_INITDB_ROOT_PASSWORD
+        resources: 
+          requests: 
+            cpu: "10m"
+            memory: "20Mi"
+          limits:
+            cpu: "20m"
+            memory: "40Mi"
+>>>>>>> 60cf4736df00f34974213c3c9242a9ab1231e774

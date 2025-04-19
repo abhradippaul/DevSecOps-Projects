@@ -24,10 +24,11 @@ COPY --from=frontend-builder /app .
 
 # Copy the .env.sample file to .env.local
 # COPY .env.docker .env.local
-RUN npm update
+# RUN npm update
 # Expose port 5173 for the Node.js application
 EXPOSE 5173
 
 # Define the default command to run the application in development mode
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+
 

@@ -20,7 +20,7 @@ spec:
         - image: abhradippaul/devsecops-project1-backend
           name: backend
           ports:
-            - containerPort: 8080
+            - containerPort: 3000
           envFrom:
             - configMapRef:
                 name: backend-cm
@@ -28,8 +28,8 @@ spec:
                 name: backend-secret
           resources:
             requests:
-              cpu: "10m"
-              memory: "20Mi"
+              cpu: "50m"
+              memory: "100Mi"
             limits:
-              cpu: "20m"
-              memory: "40Mi"
+              cpu: "100m"
+              memory: "200Mi"

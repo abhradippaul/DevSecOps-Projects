@@ -17,7 +17,7 @@ spec:
         app: frontend
     spec:
       containers:
-        - image: abhradippaul/devsecops-project1-frontend:v1
+        - image: abhradippaul/devsecops-project1-frontend:v2
           name: frontend
           ports:
             - containerPort: 80

@@ -17,7 +17,7 @@ spec:
         app: backend
     spec:
       containers:
-        - image: abhradippaul/devsecops-project1-backend:v1
+        - image: abhradippaul/devsecops-project1-backend:v2
           name: backend
           ports:
             - containerPort: 8080
